@@ -67,6 +67,7 @@ export const Scene = ({ meshData }) => {
     })
 
     scene.add(new THREE.AmbientLight(0x808080))
+
     addShadowedLight(1, 1, 1, 0xffffff, 1.35, scene)
 
     let dynamicallyImportPackage = async () => {
@@ -91,32 +92,22 @@ export const Scene = ({ meshData }) => {
     controls.minDistance = 0.3
     controls.maxDistance = 0.3 * 100
 
-    document.addEventListener('mousemove', onDocumentMouseMove, false)
-    window.addEventListener('resize', onWindowResize, false)
-    window.parent.addEventListener('keypress', keyboard)
-
-
-    function onDocumentMouseMove(event) {
+    const onDocumentMouseMove = (event) => {
       event.preventDefault()
-
       // calculate mouse position in normalized device coordinates
       // (-1 to +1) for both components
-
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1
       mouse.y = - (event.clientY / window.innerHeight) * 2 + 1
     }
 
-    function onWindowResize() {
-
+    const onWindowResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight
       camera.updateProjectionMatrix()
-
       renderer.setSize(window.innerWidth, window.innerHeight)
       controls.handleResize()
-
     }
 
-    function keyboard(ev) {
+    const keyboard = (ev) => {
       switch (ev.key || String.fromCharCode(ev.keyCode || ev.charCode)) {
         case 'h':
           if (INTERSECTED) {
@@ -202,7 +193,12 @@ export const Scene = ({ meshData }) => {
     }
 
     mount.current.appendChild(renderer.domElement)
+
     window.addEventListener('resize', handleResize)
+    window.addEventListener('mousemove', onDocumentMouseMove, false)
+    window.addEventListener('resize', onWindowResize, false)
+    window.addEventListener('keypress', keyboard)
+
     start()
 
     controls.current = { start, stop }
@@ -210,6 +206,9 @@ export const Scene = ({ meshData }) => {
     return () => {
       stop()
       window.removeEventListener('resize', handleResize)
+      window.removeEventListener('mousemove', onDocumentMouseMove)
+      window.removeEventListener('resize', onWindowResize)
+      window.removeEventListener('keypress', keyboard)
       mount.current.removeChild(renderer.domElement)
       geometry.dispose()
       material.dispose()
