@@ -62,7 +62,14 @@ export const Scene = ({ meshData }) => {
     meshData.forEach(mesh => {
       loader.load(`/mesh/${mesh.Guid}.stl`, function (geometry) {
         geometry.name = `Name: ${mesh.Name} State: ${mesh.State} Guid: ${mesh.Guid}`
-        loadMeshSTL(geometry, 0x505050, scene)
+        let color = ''
+        switch (mesh.State) {
+          case 'ok': color = 0x505050; break;
+          case 'out-of-tolerance': color = 0xb2b236; break;
+          case 'missing': color = 0xdd3333; break;
+        }
+        loadMeshSTL(geometry, color, scene)
+        // loadMeshSTL(geometry, 0x505050, scene)
       })
     })
 
