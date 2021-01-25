@@ -7,12 +7,12 @@ export default function Page() {
 
   return <>
     {!session && <>
-      Not signed in <br/>
-      <button onClick={signIn}>Sign in</button>
+      <div className="info">Not signed in <br/>
+      <button className="button" onClick={signIn}>Sign in</button></div>
     </>}
     {session && <>
-      Signed in as {session.user.email} <br/>
-      <button onClick={signOut}>Sign out</button>
+      <div className="info">Signed in as {session.user.email} <br/>
+      <button className="button" onClick={signOut}>Sign out</button></div>
       <MeshViewer/>
     </>}
   </>

@@ -1,8 +1,16 @@
 .vis {
   position: fixed;
-  top: 90px;
+  top: 140px;
   right: 0;
   bottom: 0;
   left: 0;
   background-color: white;
+}
+
+.info {
+  margin: 20px;
+}
+
+.button {
+  margin-top: 20px;
 }
