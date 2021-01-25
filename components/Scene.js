@@ -59,6 +59,9 @@ export const Scene = ({ meshData }) => {
     renderer.setClearColor('#000000')
     renderer.setSize(width, height)
 
+    let cameraTarget = new THREE.Vector3(0, - 0.1, 0);
+    camera.lookAt(cameraTarget);
+
     meshData.forEach(mesh => {
       loader.load(`/mesh/${mesh.Guid}.stl`, function (geometry) {
         geometry.name = `Name: ${mesh.Name} State: ${mesh.State} Guid: ${mesh.Guid}`
@@ -193,9 +196,11 @@ export const Scene = ({ meshData }) => {
     window.addEventListener('mousemove', onDocumentMouseMove, false)
     window.addEventListener('keypress', keyboard)
 
+    handleResize()
+
     start()
 
-    controls.current = { start, stop }
+    // controls.current = { start, stop }
 
     return () => {
       stop()
