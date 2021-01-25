@@ -141,6 +141,7 @@ export const Scene = ({ meshData }) => {
       controls.update()
 
       // update the picking ray with the camera and mouse position
+      // mouse.y -= 140
       raycaster.setFromCamera(mouse, camera)
 
       // calculate objects intersecting the picking ray
