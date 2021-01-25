@@ -203,7 +203,7 @@ export const Scene = ({ meshData }) => {
 
 
   return <div>
-    <div className="info">{info}</div>
+    <div className="mesh-info">{info}</div>
     <div className="vis" ref={mount} />
   </div>
 }
