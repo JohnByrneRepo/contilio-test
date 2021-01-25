@@ -211,8 +211,6 @@ export const Scene = ({ meshData }) => {
       stop()
       window.removeEventListener('resize', handleResize)
       mount.current.removeChild(renderer.domElement)
-
-      scene.remove(cube)
       geometry.dispose()
       material.dispose()
     }
