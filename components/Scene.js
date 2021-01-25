@@ -56,13 +56,14 @@ export const Scene = ({ meshData }) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true })
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshBasicMaterial({ color: 0xff00ff })
-    const cube = new THREE.Mesh(geometry, material)
+    // const cube = new THREE.Mesh(geometry, material)
     const loader = new STLLoader();
     let controls, cameraTarget
     let mouse = new THREE.Vector2(), INTERSECTED;
+    let raycaster = new THREE.Raycaster();
 
     camera.position.z = 4
-    scene.add(cube)
+    // scene.add(cube)
     renderer.setClearColor('#000000')
     renderer.setSize(width, height)
 
@@ -177,11 +178,39 @@ export const Scene = ({ meshData }) => {
     }
 
     const animate = () => {
-      cube.rotation.x += 0.01
-      cube.rotation.y += 0.01
+      requestAnimationFrame(animate);
+      controls.update();
 
-      renderScene()
-      frameId = window.requestAnimationFrame(animate)
+      // update the picking ray with the camera and mouse position
+      raycaster.setFromCamera(mouse, camera);
+
+      // calculate objects intersecting the picking ray
+
+      var intersects = raycaster.intersectObjects(visibleObjects);
+
+      if (intersects.length > 0) {
+        if (INTERSECTED != intersects[0].object) {
+          if (INTERSECTED) {
+            INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+          }
+          INTERSECTED = intersects[0].object;
+          INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
+          INTERSECTED.material.emissive.setHex(0x808080);
+
+          var infoElement = document.getElementById('info');
+          // infoElement.innerHTML = INTERSECTED.geometry.name;
+        }
+      } else {
+        if (INTERSECTED) {
+          INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+          INTERSECTED = null;
+
+          var infoElement = document.getElementById('info');
+          // infoElement.innerHTML = "";
+        }
+      }
+
+      renderer.render(scene, camera);
     }
 
     const start = () => {
