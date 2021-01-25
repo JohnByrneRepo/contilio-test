@@ -100,13 +100,6 @@ export const Scene = ({ meshData }) => {
       mouse.y = - (event.clientY / window.innerHeight) * 2 + 1
     }
 
-    const onWindowResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight
-      camera.updateProjectionMatrix()
-      renderer.setSize(window.innerWidth, window.innerHeight)
-      controls.handleResize()
-    }
-
     const keyboard = (ev) => {
       switch (ev.key || String.fromCharCode(ev.keyCode || ev.charCode)) {
         case 'h':
@@ -136,17 +129,11 @@ export const Scene = ({ meshData }) => {
       }
     }
 
-    const renderScene = () => {
-      renderer.render(scene, camera)
-    }
-
     const handleResize = () => {
-      width = mount.current.clientWidth
-      height = mount.current.clientHeight
-      renderer.setSize(width, height)
-      camera.aspect = width / height
-      camera.updateProjectionMatrix()
-      renderScene()
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      controls.handleResize();
     }
 
     const animate = () => {
@@ -196,7 +183,6 @@ export const Scene = ({ meshData }) => {
 
     window.addEventListener('resize', handleResize)
     window.addEventListener('mousemove', onDocumentMouseMove, false)
-    window.addEventListener('resize', onWindowResize, false)
     window.addEventListener('keypress', keyboard)
 
     start()
@@ -207,7 +193,6 @@ export const Scene = ({ meshData }) => {
       stop()
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('mousemove', onDocumentMouseMove)
-      window.removeEventListener('resize', onWindowResize)
       window.removeEventListener('keypress', keyboard)
       mount.current.removeChild(renderer.domElement)
       geometry.dispose()
