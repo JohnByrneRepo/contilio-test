@@ -1,7 +1,14 @@
 import React from 'react'
 import * as THREE from 'three'
 var STLLoader = require('three-stl-loader')(THREE)
+// import axios from 'axios'
 
+// import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
+// import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
+// var THREE = require('three');
+
+
+// var TrackballControls = require('three-trackballcontrols');
 export const Scene = ({ meshData }) => {
   const { useRef, useEffect, useState } = React
   const mount = useRef(null)
@@ -52,6 +59,7 @@ export const Scene = ({ meshData }) => {
     const cube = new THREE.Mesh(geometry, material)
     const loader = new STLLoader();
     let controls, cameraTarget
+    let mouse = new THREE.Vector2(), INTERSECTED;
 
     camera.position.z = 4
     scene.add(cube)
@@ -68,17 +76,92 @@ export const Scene = ({ meshData }) => {
     scene.add(new THREE.AmbientLight(0x808080));
     addShadowedLight(1, 1, 1, 0xffffff, 1.35, scene);
 
+    let dynamicallyImportPackage = async () => {
+      let TrackballControls
+
+      await import('three/examples/jsm/controls/TrackballControls')
+        // you can now use the package in here
+        .then(module => {
+          TrackballControls = module.TrackballControls
+        })
+        .catch(e => console.log(e))
+
+      return TrackballControls
+    }
+    let TrackballControls = await dynamicallyImportPackage()
+
     // let TrackballControls = await axios.get('https://cdn.jsdelivr.net/npm/three-trackballcontrols@0.9.0/index.min.js')
-    // controls = new THREE.TrackballControls(camera, renderer.domElement);
-    // controls.rotateSpeed = 2.0;
-    // controls.zoomSpeed = 0.3;
-    // controls.panSpeed = 0.2;
-    // controls.noZoom = false;
-    // controls.noPan = false;
-    // controls.staticMoving = true;
-    // controls.dynamicDampingFactor = 0.3;
-    // controls.minDistance = 0.3;
-    // controls.maxDistance = 0.3 * 100;
+    controls = new TrackballControls(camera, renderer.domElement);
+    controls.rotateSpeed = 2.0;
+    controls.zoomSpeed = 0.3;
+    controls.panSpeed = 0.2;
+    controls.noZoom = false;
+    controls.noPan = false;
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+    controls.minDistance = 0.3;
+    controls.maxDistance = 0.3 * 100;
+
+    document.addEventListener('mousemove', onDocumentMouseMove, false);
+    window.addEventListener('resize', onWindowResize, false);
+    window.parent.addEventListener('keypress', keyboard);
+
+
+    function onDocumentMouseMove(event) {
+      event.preventDefault();
+
+      // calculate mouse position in normalized device coordinates
+      // (-1 to +1) for both components
+
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    function onWindowResize() {
+
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      controls.handleResize();
+
+    }
+
+    function keyboard(ev) {
+
+      switch (ev.key || String.fromCharCode(ev.keyCode || ev.charCode)) {
+
+        case 'h':
+          if (INTERSECTED) {
+            INTERSECTED.material.visible = false;
+            INTERSECTED.material.needsUpdate = true;
+
+            // remove from visible objects
+            var idx = visibleObjects.indexOf(INTERSECTED);
+            if (idx >= 0) {
+              visibleObjects.splice(idx, 1);
+
+              // add to invisible objects
+              invisibleObjects.push(INTERSECTED);
+            }
+          }
+
+          break;
+
+        case 'r':
+          invisibleObjects.forEach(function (item, idx) {
+            item.material.visible = true;
+            item.material.needsUpdate = true;
+          })
+
+          visibleObjects = visibleObjects.concat(invisibleObjects);
+          invisibleObjects = [];
+
+          break;
+      }
+
+    }
+
 
     const renderScene = () => {
       renderer.render(scene, camera)
@@ -92,7 +175,7 @@ export const Scene = ({ meshData }) => {
       camera.updateProjectionMatrix()
       renderScene()
     }
-    
+
     const animate = () => {
       cube.rotation.x += 0.01
       cube.rotation.y += 0.01
@@ -116,8 +199,8 @@ export const Scene = ({ meshData }) => {
     window.addEventListener('resize', handleResize)
     start()
 
-    // controls.current = { start, stop }
-    
+    controls.current = { start, stop }
+
     return () => {
       stop()
       window.removeEventListener('resize', handleResize)
@@ -129,6 +212,6 @@ export const Scene = ({ meshData }) => {
     }
   }, [])
 
-  
+
   return <div className="vis" ref={mount} onClick={() => setAnimating(!isAnimating)} />
 }
